@@ -18,6 +18,7 @@ import java.util.UUID;
 public class UserController {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<UserProfileResponse>> getProfile(
@@ -34,6 +35,19 @@ public class UserController {
             user.setDefaultCurrency(request.getDefaultCurrency().toUpperCase());
 
         return ResponseEntity.ok(ApiResponse.ok(toProfileResponse(userRepository.save(user))));
+    }
+
+    @PutMapping("/me/password")
+    public ResponseEntity<ApiResponse<Void>> changePassword(
+            @Valid @RequestBody ChangePasswordRequest request,
+            @AuthenticationPrincipal User user) {
+
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPasswordHash())) {
+            throw new IllegalArgumentException("Current password is incorrect.");
+        }
+        user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+        return ResponseEntity.ok(ApiResponse.ok("Password updated", null));
     }
 
     private UserProfileResponse toProfileResponse(User user) {
