@@ -1,0 +1,44 @@
+version: '3.9'
+
+services:
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: money-giggle-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: money-giggle
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secret
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: money-giggle-api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/money-giggle
+      DB_USERNAME: postgres
+      DB_PASSWORD: secret
+      JWT_SECRET: ${JWT_SECRET:-3cfa76ef14937c1c0ea519f8fc057a80fcd04a7420f8e8bcd0a7567c272e007b}
+      CORS_ORIGINS: http://localhost:3000,http://localhost:8081
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./tessdata:/usr/share/tesseract-ocr/5/tessdata  # mount tesseract data
+
+volumes:
+  postgres_data:
