@@ -1,0 +1,30 @@
+{
+  "expo": {
+    "name": "Money Manager",
+    "slug": "moneymanager",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "moneymanager",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "backgroundColor": "#0A0A0F"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.moneymanager.app"
+    },
+    "android": {
+      "package": "com.moneymanager.app"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-image-picker",
+      "expo-font",
+      "expo-status-bar"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
